@@ -1,22 +1,28 @@
-package topics
+  package topics
 
 /**
  * PHẦN 15: ƯU ĐIỂM CỦA DATA CLASS TRONG KOTLIN
  *
- * Lý thuyết:
- * - Data class được sinh ra chuyên để tạo các lớp lưu trữ dữ liệu (POKO/DTO),
- *   giúp loại bỏ hoàn toàn hàng chục dòng code mẫu (boilerplate) như trong Java.
- * - Trình biên dịch tự động sinh ra các phương thức từ các tham số trong Primary Constructor:
- *   1. equals(): So sánh bình đẳng giá trị (Structural Equality).
- *   2. hashCode(): Đảm bảo hai object có cùng giá trị sẽ có cùng hash (dùng trong HashMap/HashSet).
- *   3. toString(): Trả về chuỗi định dạng rõ ràng: "User(name=Alice, age=25)".
- *   4. copy(): Tạo bản sao mới với tùy chọn sửa đổi các trường mong muốn.
- *   5. component1(), component2(), ... componentN(): Hỗ trợ Destructuring Declaration.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Tạo các class chuyên biệt dùng để mô hình hóa và lưu trữ dữ liệu (DTO / Value Object / POKO).
+ * - Trình biên dịch tự động sinh ra 5 nhóm phương thức cốt lõi dựa trên các thuộc tính trong Primary Constructor:
+ *   1. `equals()`: So sánh theo nội dung giá trị (Structural Equality).
+ *   2. `hashCode()`: Đảm bảo hai object có cùng thuộc tính sẽ có cùng mã băm (dùng trong HashMap/HashSet).
+ *   3. `toString()`: Hiển thị chuỗi rõ ràng, tường minh ("User(id=1, name=Alice)").
+ *   4. `copy()`: Tạo bản sao mới với tùy chọn chỉnh sửa một số thuộc tính mong muốn.
+ *   5. `component1(), component2(), ... componentN()`: Hỗ trợ cú pháp phân rã Destructuring Declaration (`val (id, name) = user`).
  *
- * Điều kiện của Data Class:
- * - Primary Constructor phải có ít nhất 1 tham số.
- * - Mọi tham số trong Primary Constructor bắt buộc phải là 'val' hoặc 'var'.
- * - Không thể đánh dấu là abstract, open, sealed, hoặc inner.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Trong Java, một class POJO đòi hỏi hơn 100 dòng mã boilerplate (getter, setter, equals, hashCode, toString)
+ *   và rất dễ phát sinh lỗi khi người bảo trì thêm trường mới nhưng quên cập nhật lại `equals`/`hashCode`.
+ * - Kotlin giải quyết toàn bộ sự phức tạp này chỉ với 1 dòng code duy nhất: `data class User(val id: Int, val name: String)`.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Data Class:
+ *   + *Tối ưu nhất cho*: Các đối tượng mô tả dữ liệu thuần túy (DTO, API Response/Request, UI State trong ViewModel, Database Entities).
+ * - Regular Class:
+ *   + *Tối ưu cho*: Các lớp chứa logic nghiệp vụ, quản lý luồng (Service, Repository, ViewModel, Controller),
+ *     hoặc khi cần kế thừa đa tầng (vì Data Class không thể đánh dấu là `open` hay `abstract`).
  */
 
 // ==========================================
@@ -35,8 +41,7 @@ fun exampleDataClassFeatures() {
 
     // 1. Tự động sinh toString()
     println("toString: $book1")
-
-    // 2. Tự động sinh equals() và hashCode()
+        // 2. Tự động sinh equals() và hashCode()
     println("book1 == book2: ${book1 == book2}") // true vì các thuộc tính bằng nhau
     println("book1.hashCode == book2.hashCode: ${book1.hashCode() == book2.hashCode()}") // true
 
@@ -79,7 +84,7 @@ fun runPart15() {
     println("==================================================")
     exampleDataClassFeatures()
 
-    println("\n--- KIỂM TRA BÀI TẬP ---")
+    println("\n--- KIỂM T   RA BÀI TẬP ---")
     val list = listOf(
         Student("SV01", "Nguyễn Văn An", 8.2),
         Student("SV02", "Trần Mai Lan", 9.5),

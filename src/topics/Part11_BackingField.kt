@@ -3,29 +3,24 @@ package topics
 /**
  * PHẦN 11: BACKING FIELD LÀ GÌ, TÁC DỤNG GÌ VÀ TẠI SAO KOTLIN CẦN NÓ?
  *
- * Lý thuyết:
- * 1. Khái niệm:
- *    - 'field' (Backing Field) là một trường ẩn (hidden field) do trình biên dịch sinh ra
- *      để lưu trữ giá trị vật lý thực tế của thuộc tính trong bộ nhớ RAM.
- *    - Từ khóa 'field' chỉ có thể sử dụng bên trong custom getter hoặc custom setter.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - `field` (Backing Field) là định danh đại diện cho ô nhớ lưu trữ vật lý thực sự của thuộc tính trong RAM.
+ * - Chỉ tồn tại và được phép sử dụng bên trong khối mã của Custom Getter hoặc Custom Setter.
  *
- * 2. Tác dụng:
- *    - Lưu trữ trạng thái (state) thực sự của thuộc tính.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Ngăn chặn lỗi lặp vô hạn `StackOverflowError` gây sập ứng dụng:
+ *   Trong Kotlin, mọi thao tác truy cập `this.property = value` đều được dịch thành lời gọi hàm setter ngầm.
+ *   Nếu bên trong chính setter mà bạn viết `this.property = value`, nó sẽ vô tình gọi lại chính setter đó
+ *   lặp đi lặp lại mãi mãi cho đến khi tràn bộ nhớ Call Stack.
+ * - Từ khóa `field` ra đời để lập trình viên có thể đọc/ghi trực tiếp vào ô nhớ mà KHÔNG kích hoạt lại setter/getter.
  *
- * 3. Tại sao Kotlin cần Backing Field?
- *    - Tránh Đệ Quy Vô Hạn (Infinite Recursion):
- *      Trong Java, ta có biến private `int count` và hàm `setCount(int value) { this.count = value; }`.
- *      Trong Kotlin, cú pháp truy cập thuộc tính luôn thông qua getter/setter ngầm.
- *      Nếu trong setter của 'count', ta viết:
- *          set(value) {
- *              this.count = value // -> VÔ TÌNH GỌI LẠI CHÍNH SETTER NÀY!
- *          }
- *      Việc này sẽ gây lặp vô hạn và lập tức crash chương trình với lỗi java.lang.StackOverflowError.
- *    - Do đó, từ khóa 'field' được cung cấp để gán/đọc trực tiếp giá trị vào ô nhớ
- *      mà KHÔNG kích hoạt lại setter/getter.
- *
- * 4. Khi nào một thuộc tính KHÔNG có Backing Field?
- *    - Khi thuộc tính là computed property (chỉ có get() tính toán từ cái khác mà không đọc/ghi 'field').
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Khi nào có Backing Field (Tốn bộ nhớ RAM):
+ *   + Khi thuộc tính sử dụng getter/setter mặc định.
+ *   + Hoặc khi custom getter/setter có chứa từ khóa `field`.
+ * - Khi nào KHÔNG có Backing Field (Tối ưu tiết kiệm RAM):
+ *   + Khi thuộc tính là Computed Property (chỉ có custom `get()` tính toán từ thuộc tính khác).
+ *   + Instance của class sẽ không tốn bất kỳ byte RAM nào để lưu thuộc tính đó.
  */
 
 // ==========================================
@@ -50,7 +45,6 @@ class UserAccount {
     val isRegistered: Boolean
         get() = username != "anonymous"
 }
-
 // ==========================================
 // 2. BÀI TẬP THỰC HÀNH (EXERCISES)
 // ==========================================

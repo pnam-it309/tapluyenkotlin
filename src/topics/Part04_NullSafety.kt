@@ -3,13 +3,25 @@ package topics
 /**
  * PHẦN 4: THỂ HIỆN CỦA NULL SAFETY TRONG KOTLIN
  *
- * Lý thuyết:
- * 1. Nullable type (T?): Cho phép biến nhận giá trị null (var name: String? = null).
- * 2. Safe Call (?.): Gọi phương thức/thuộc tính an toàn, trả về null nếu đối tượng null (name?.length).
- * 3. Elvis Operator (?:): Cung cấp giá trị mặc định khi biểu thức phía trước trả về null (val len = name?.length ?: 0).
- * 4. Not-null Assertion (!!): Ép trình biên dịch coi biến là non-null; văng NullPointerException nếu đối tượng là null.
- * 5. let Block: Kết hợp cùng Safe Call (obj?.let { ... }) để chỉ thực thi khối lệnh khi đối tượng khác null.
- * 6. Smart Cast sau null check: Sau 'if (name != null)', biến 'name' tự động biến thành Non-null String.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Tách biệt rõ ràng hệ thống kiểu Non-null (`T`) và Nullable (`T?`) ở cấp độ biên dịch.
+ * - Cung cấp bộ công cụ toán tử hoàn chỉnh để làm việc với null: Safe Call `?.`,
+ *   Elvis `?:`, Not-null Assertion `!!`, Smart Cast và Scoping `let`.
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Loại bỏ hoàn toàn lỗi crash kinh điển NullPointerException (NPE) làm sập app lúc runtime.
+ * - Giải quyết vấn đề "Kim tự tháp if-null" (Pyramid of Doom) trong Java khi phải lồng
+ *   nhiều tầng `if (user != null && user.getAddress() != null...)`.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Safe Call `?.`: Tối ưu khi đọc thuộc tính lồng nhau. Nếu có null ở bất kỳ mắt xích nào,
+ *   toàn bộ biểu thức trả về `null` an toàn.
+ * - Elvis `?:`: Tối ưu khi cần giá trị mặc định (Fallback value) hoặc dùng làm Guard Clause
+ *   để ngắt hàm sớm (`val token = session?.token ?: return false`).
+ * - `?.let { }`: Tối ưu khi cần thực thi một khối lệnh chỉ khi biến khác null.
+ * - Not-null assertion `!!`: Cực kỳ rủi ro (Code Smell), chỉ nên dùng trong Unit Test (Fail-fast)
+ *   hoặc khi 100% đảm bảo contract sau khi gọi thư viện Java.
+ * - Smart Cast: Tự động biến `val x: String?` thành `String` sau khi qua khối kiểm tra `if (x != null)`.
  */
 
 // ==========================================
@@ -23,7 +35,6 @@ fun exampleNullSafetyOperators() {
     println("--- 4.1 Minh họa các toán tử Null Safety ---")
     val nullableName: String? = "Kotlin Developer"
     val emptyName: String? = null
-
     // Safe Call (?.)
     println("nullableName length: ${nullableName?.length}") // In ra: 16
     println("emptyName length: ${emptyName?.length}")       // In ra: null (không hề crash NPE!)
@@ -45,6 +56,13 @@ fun exampleNullSafetyOperators() {
     val city2 = user2.address?.city?.name ?: "Chưa cập nhật thành phố"
     println("Thành phố của user1: $city1")
     println("Thành phố của user2: $city2")
+}
+
+fun exampleOptimalGuardClause(input: String?): String {
+    println("--- 4.2 Minh họa Guard Clause tối ưu bằng Elvis Operator ---")
+    // Thay vì if-else lồng nhau phức tạp:
+    val validText = input?.takeIf { it.isNotBlank() } ?: return "GIÁ TRỊ MẶC ĐỊNH (GUARD CLAUSE)"
+    return "ĐÃ XỬ LÝ: ${validText.trim().uppercase()}"
 }
 
 // ==========================================
@@ -84,6 +102,8 @@ fun runPart04() {
     println("   CHẠY THỰC HÀNH PHẦN 4: NULL SAFETY")
     println("==================================================")
     exampleNullSafetyOperators()
+    println(exampleOptimalGuardClause("  kotlin pro  "))
+    println(exampleOptimalGuardClause(null))
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
     // Test Bài tập 4.1

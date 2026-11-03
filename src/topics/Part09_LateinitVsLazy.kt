@@ -1,18 +1,37 @@
 package topics
 
+import kotlin.isInitialized
+
 /**
  * PHẦN 9: SO SÁNH LATEINIT VS BY LAZY TRONG KOTLIN
  *
- * Lý thuyết so sánh:
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Cung cấp hai cơ chế trì hoãn việc cấp phát / khởi tạo giá trị cho thuộc tính:
+ *   1. `lateinit var`: Khởi tạo muộn thủ công (Manual late initialization) cho biến non-null.
+ *   2. `val ... by lazy`: Khởi tạo lười tự động (Automatic lazy initialization) ở lần truy cập đầu tiên.
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Loại bỏ việc phải khai báo biến dạng Nullable (`var prop: Type? = null`) chỉ để chờ khởi tạo sau,
+ *   giúp tránh phải dùng toán tử `?.` hoặc `!!` ở khắp mọi nơi trong mã nguồn.
+ * - Tiết kiệm tài nguyên CPU & RAM: Tránh khởi tạo các đối tượng nặng (Database, Network, File Parser)
+ *   lúc ứng dụng khởi động khi người dùng có thể chưa cần dùng tới chức năng đó.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
  * ┌──────────────────────┬───────────────────────────────────┬───────────────────────────────────┐
  * │ Tiêu chí             │ lateinit                          │ by lazy                           │
  * ├──────────────────────┼───────────────────────────────────┼───────────────────────────────────┤
  * │ Từ khóa đi kèm       │ Bắt buộc dùng với 'var'           │ Bắt buộc dùng với 'val'           │
  * │ Kiểu dữ liệu         │ Không hỗ trợ Primitive (Int...)   │ Áp dụng cho MỌI kiểu dữ liệu      │
- * │ Cơ chế khởi tạo      │ Khởi tạo thủ công (Manual init)   │ Tự động khởi tạo ở lần gọi đầu    │
+ * │ Cơ chế khởi tạo      │ Khởi tạo thủ công (bằng code gán) │ Tự động chạy lambda ở lần đọc đầu │
  * │ Kiểm tra khởi tạo    │ Dùng ::prop.isInitialized         │ Tự động cache kết quả sau lần 1   │
  * │ Thread Safety        │ Không an toàn đa luồng            │ Mặc định Thread-safe (SYNCHRONIZED│
  * └──────────────────────┴───────────────────────────────────┴───────────────────────────────────┘
+ * - lateinit tối ưu nhất khi:
+ *   + Dùng với Dependency Injection framework (Dagger, Hilt, Spring `@Autowired`).
+ *   + Khởi tạo theo vòng đời của framework (Android `onCreate()`, JUnit `@Before setUp()`).
+ * - by lazy tối ưu nhất khi:
+ *   + Khởi tạo các tài nguyên nặng (Heavy Object, Database connection, Bitmap loading, Service client)
+ *     chỉ đọc (Read-only) và cần nạp theo nhu cầu (On-demand).
  */
 
 // ==========================================
@@ -58,6 +77,46 @@ fun exampleLateinitVsLazy() {
     // Lần 2: Không tính toán lại nữa, lấy ngay từ cache!
     println("Lần truy cập 2: ${container.heavyCalculationResult}")
 }
+
+class lateinitexample(){
+    lateinit var apiService :String
+    fun setup(){
+        apiService = "aeorstride.com"
+    }
+    fun doST(){
+        if (::apiService.isInitialized) {
+            println("Service: $apiService")
+        } else {
+            println("apiService chưa được khởi tạo!")
+        }
+    }
+    fun updateService() {
+        // Có thể gán lại giá trị mới vì là 'var'
+        apiService = "https://api.v2.example.com"
+    }
+}
+class LazyExample {
+    // 1. Bắt buộc dùng 'val' (không dùng được với 'var')
+    // 2. Đi kèm block code chứa logic khởi tạo
+    // 3. Áp dụng được cho mọi kiểu dữ liệu (kể cả Int, Double, Class...)
+    // 4. Mặc định Thread-safe (an toàn khi dùng đa luồng)
+    val heavyDatabase: String by lazy {
+        println("--> Đang khởi tạo Database (chỉ chạy duy nhất 1 lần khi gọi tới)...")
+        "MySQL_Connection_Object"
+    }
+
+    fun executeQuery() {
+        println("Chưa dùng đến heavyDatabase...")
+
+        // Lần đầu tiên truy cập: Block code trong 'by lazy' mới chạy
+        println("Lần 1 truy cập: $heavyDatabase")
+
+        // Lần thứ hai trở đi: Trả về luôn kết quả đã lưu trước đó, không chạy lại block code
+        println("Lần 2 truy cập: $heavyDatabase")
+    }
+}
+
+
 
 // ==========================================
 // 2. BÀI TẬP THỰC HÀNH (EXERCISES)

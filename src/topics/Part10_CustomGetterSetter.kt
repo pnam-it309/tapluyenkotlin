@@ -3,14 +3,24 @@ package topics
 /**
  * PHẦN 10: CUSTOM GET VÀ SET TRONG KOTLIN
  *
- * Lý thuyết:
- * - Trong Kotlin, mỗi property (thuộc tính) khi khai báo đều tự động sinh ra
- *   getter (và setter nếu là 'var').
- * - Kotlin cho phép tùy chỉnh logic khi ĐỌC (getter) hoặc GHI (setter):
- *   + 'val' là read-only nên chỉ có thể có custom getter, không thể có setter.
- *   + 'var' có thể có cả custom getter và custom setter.
- *   + Setter có thể thay đổi phạm vi truy cập (ví dụ 'private set' để chỉ nội bộ class được gán).
- *   + Từ khóa 'field' đại diện cho Backing Field (nơi lưu trữ giá trị thực tế trong RAM).
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Tùy biến hành vi khi ĐỌC (getter) hoặc GHI (setter) của một thuộc tính trong class.
+ * - Cho phép tạo các Computed Properties (thuộc tính tính toán động) trả về giá trị tức thời mà không cần lưu biến.
+ * - Cho phép giới hạn quyền ghi thông qua `private set`.
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Đem lại cú pháp truy cập tự nhiên, đẹp mắt như `person.fullName`, `rect.area` thay vì
+ *   phải gọi hàng loạt phương thức getter kiểu Java như `person.getFullName()`, `rect.getArea()`.
+ * - Cho phép chặn và kiểm tra tính hợp lệ của dữ liệu (Validation logic) ngay tại setter,
+ *   bảo vệ đối tượng luôn ở trạng thái toàn vẹn.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Computed Property (`val area get() = width * height`) vs Hàm thường (`fun calculateArea()`):
+ *   + *Dùng Computed Property*: Thao tác tính toán rất nhẹ ($O(1)$), không có side-effect, không ném exception,
+ *     đại diện cho một trạng thái của đối tượng (vd: `val isEmpty get() = size == 0`).
+ *   + *Dùng Hàm thường*: Thao tác nặng tốn CPU, đọc ghi IO/Database, bất đồng bộ hoặc kết quả có thể khác nhau sau mỗi lần gọi.
+ * - Tiết kiệm RAM: Computed Property không tạo ra trường (Backing Field) nào trong RAM, chỉ biên dịch thành
+ *   một hàm getter thông thường ở cấp độ JVM Bytecode.
  */
 
 // ==========================================

@@ -3,21 +3,28 @@ package topics
 /**
  * PHẦN 6: CONSTRUCTORS TRONG KOTLIN (PRIMARY & SECONDARY)
  *
- * Lý thuyết:
- * 1. Primary Constructor:
- *    - Nằm ngay trên header của Class declaration: class User(val name: String, val age: Int = 18)
- *    - Chỉ có TỐI ĐA 1 Primary Constructor.
- *    - Có thể khai báo trực tiếp 'val'/'var' ở tham số để tạo luôn thuộc tính (property).
- *    - Không chứa code thực thi trực tiếp; mọi logic khởi tạo phải đặt trong khối 'init { ... }'.
- * 2. Secondary Constructor:
- *    - Khai báo bên trong body của class bằng từ khóa 'constructor(...)'.
- *    - Có thể có NHIỀU Secondary Constructor với các danh sách tham số khác nhau.
- *    - Chứa code thực thi trực tiếp bên trong cặp ngoặc nhọn.
- *    - BẮT BUỘC phải ủy quyền (delegate) về Primary Constructor bằng từ khóa ': this(...)'
- *      nếu class đã khai báo Primary Constructor.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Cung cấp cơ chế khởi tạo đối tượng toàn diện:
+ *   + Primary Constructor: Khai báo ngay trên header class, tự động tạo thuộc tính nếu dùng `val`/`var`.
+ *   + Khối `init`: Nơi thực thi logic kiểm tra hợp lệ (Validation) và khởi tạo lúc tạo instance.
+ *   + Secondary Constructor: Bổ sung các cách khởi tạo khác, bắt buộc ủy quyền (`: this(...)`) về Primary.
  *
- * TIP HIỆN ĐẠI: Trong Kotlin, nhờ có "Default Argument Values" (tham số mặc định),
- * chúng ta hiếm khi cần Secondary Constructor so với Java!
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Xóa bỏ hoàn toàn "Telescoping Constructor Pattern" trong Java (phải viết 4–5 constructor nạp chồng
+ *   với số lượng tham số tăng dần và gán `this.x = x`).
+ * - Nhờ tính năng Default Arguments (`age: Int = 18`), một Primary Constructor duy nhất có thể
+ *   thay thế toàn bộ các constructor nạp chồng phức tạp.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Primary Constructor + Default Arguments:
+ *   + *Tối ưu nhất trong 95% trường hợp*: Giữ class cực kỳ ngắn gọn, hỗ trợ Named Arguments
+ *     khi gọi khởi tạo (`Config(host = "localhost", timeout = 5000)`).
+ * - Secondary Constructor:
+ *   + *Tối ưu khi*:
+ *     1. Kế thừa các class framework Java/Android (như Custom View cần nạp chồng 3 constructor
+ *        `Context`, `AttributeSet`, `defStyleAttr`).
+ *     2. Cần cung cấp logic tiền xử lý hoặc chuyển đổi kiểu dữ liệu trước khi gọi Primary Constructor
+ *        (ví dụ: nhận chuỗi định dạng đặc biệt rồi bóc tách ra dữ liệu).
  */
 
 // ==========================================
@@ -41,6 +48,28 @@ class Person(val name: String) { // Primary Constructor
     constructor(name: String, age: Int, email: String) : this(name, age) {
         this.email = email
     }
+}
+
+// Cách làm tối ưu chuẩn Kotlin: Primary Constructor với Default Arguments
+class ModernPerson(
+    val name: String,
+    val age: Int = 0,
+    val email: String = ""
+) {
+    init {
+        require(name.isNotBlank()) { "Tên không được để trống!" }
+    }
+}
+
+fun exampleConstructorOptimalVsLegacy() {
+    println("--- 6.1 So sánh: Secondary Constructors vs Default Arguments ---")
+    // Cách tối ưu: Linh hoạt mọi cách gọi chỉ với 1 constructor duy nhất
+    val m1 = ModernPerson("Alice")
+    val m2 = ModernPerson("Bob", age = 25)
+    val m3 = ModernPerson("Charlie", email = "charlie@email.com")
+    println("m1: ${m1.name}, age: ${m1.age}, email: '${m1.email}'")
+    println("m2: ${m2.name}, age: ${m2.age}")
+    println("m3: ${m3.name}, email: ${m3.email}")
 }
 
 // ==========================================
@@ -112,6 +141,7 @@ fun runPart06() {
     println("p1: ${p1.name}, age: ${p1.age}")
     println("p2: ${p2.name}, age: ${p2.age}")
     println("p3: ${p3.name}, age: ${p3.age}, email: ${p3.email}")
+    exampleConstructorOptimalVsLegacy()
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
 //    // Test Primary Constructor với giá trị mặc định

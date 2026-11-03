@@ -3,7 +3,20 @@ package topics
 /**
  * PHẦN 13: SO SÁNH ENUM CLASS VÀ SEALED CLASS TRONG KOTLIN
  *
- * Lý thuyết:
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Quản lý một tập hợp hữu hạn (Restricted Hierarchy / Closed set) các trạng thái,
+ *   cho phép biểu thức `when` kiểm tra triệt để (Exhaustive) mà không cần nhánh `else`.
+ * - `enum class`: Tập hợp các hằng số giá trị cố định (Value-based).
+ * - `sealed class` / `sealed interface`: Phân cấp kế thừa đóng của các kiểu dữ liệu khác nhau (Type-based).
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Đảm bảo tính Type-safe tuyệt đối: Tránh việc lập trình viên quên xử lý một trạng thái mới bổ sung.
+ *   Compiler sẽ lập tức báo lỗi đỏ tại build-time nếu còn thiếu sót nhánh nào trong `when`.
+ * - Giải quyết giới hạn của Enum: Trong Enum, mọi instance đều phải có chung một bộ thuộc tính.
+ *   Trong khi đó với `sealed class`, mỗi trạng thái con có thể là một `data class` mang dữ liệu hoàn toàn khác biệt
+ *   hoặc là một `object` không mang dữ liệu.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
  * ┌─────────────────────────────┬─────────────────────────────────┬─────────────────────────────────┐
  * │ Tiêu chí                    │ enum class                      │ sealed class                    │
  * ├─────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
@@ -13,9 +26,10 @@ package topics
  * │ Lưu trữ State khác nhau     │ KHÔNG linh hoạt để mang state   │ CỰC KỲ linh hoạt để mang state  │
  * │                             │ động theo từng trường hợp       │ riêng biệt cho mỗi trạng thái   │
  * │ Kiểm tra 'when' exhaustive  │ Có kiểm tra đủ mọi enum case    │ Có kiểm tra đủ mọi subclass con │
- * │ Trường hợp sử dụng tiêu biểu│ Hướng (Đông, Tây...), Giới tính │ UI State (Loading, Success,     │
- * │                             │ Thứ trong tuần, HTTP Status Code│ Error), Result pattern, Event   │
  * └─────────────────────────────┴─────────────────────────────────┴─────────────────────────────────┘
+ * - enum class tối ưu nhất cho: Các danh mục cố định, dữ liệu tĩnh (Hướng: `NORTH/SOUTH`, Màu sắc, `HttpStatus`).
+ * - sealed class tối ưu nhất cho: State Machine, Quản lý trạng thái UI trong MVI/MVVM (`Loading`, `Success(data)`, `Error(exception)`),
+ *   hoặc biểu diễn kết quả trả về từ API / Database.
  */
 
 // ==========================================
@@ -36,7 +50,6 @@ enum class HttpStatus(val code: Int, val description: String) {
 sealed class NetworkResult<out T> {
     // Trạng thái Loading: không cần mang dữ liệu, có thể là singleton 'object'
     object Loading : NetworkResult<Nothing>()
-
     // Trạng thái Success: mang theo dữ liệu kiểu T
     data class Success<out T>(val data: T) : NetworkResult<T>()
 
@@ -92,9 +105,9 @@ fun runPart13() {
     println("   CHẠY THỰC HÀNH PHẦN 13: ENUM VS SEALED CLASS")
     println("==================================================")
     println("Enum HTTP OK: ${HttpStatus.OK.code} - ${HttpStatus.OK.description}")
-    println(renderUi(NetworkResult.Loading))
-    println(renderUi(NetworkResult.Success("Danh sách 50 sản phẩm")))
-    println(renderUi(NetworkResult.Error(404, "Không tìm thấy user")))
+//    println(renderUi(NetworkResult.Loading))
+//    println(renderUi(NetworkResult.Success("Danh sách 50 sản phẩm")))
+//    println(renderUi(NetworkResult.Error(404, "Không tìm thấy user")))
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
     val s1 = getOrderStatusSummary(OrderStatus.Pending)

@@ -3,19 +3,27 @@ package topics
 /**
  * PHẦN 5: MUTABLE VÀ IMMUTABLE TRONG KOTLIN
  *
- * Lý thuyết:
- * - Immutable (Read-only):
- *   + Khai báo biến: 'val' (chỉ gán giá trị 1 lần, không thể gán lại).
- *   + Collections: 'List', 'Map', 'Set' (không có hàm add, remove, clear, put...).
- * - Mutable (Cho phép sửa):
- *   + Khai báo biến: 'var' (có thể gán lại giá trị mới).
- *   + Collections: 'MutableList', 'MutableMap', 'MutableSet' (có các hàm thay đổi dữ liệu).
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Phân định rõ ràng giữa dữ liệu chỉ đọc (Immutable / Read-only) và dữ liệu có thể sửa đổi (Mutable).
+ * - Cung cấp ở cả 2 cấp độ:
+ *   + Cấp độ biến: `val` (chỉ gán 1 lần) vs `var` (cho phép gán lại).
+ *   + Cấp độ Collections: `List`/`Map`/`Set` (Read-only interface) vs `MutableList`/`MutableMap`/`MutableSet`.
  *
- * LƯU Ý QUAN TRỌNG:
- * - 'val list = mutableListOf(1, 2)' nghĩa là con trỏ 'list' không thể trỏ sang đối tượng khác,
- *   NHƯNG nội dung bên trong mutableList vẫn có thể bị thay đổi (add/remove)!
- * - Để bảo vệ tính đóng gói (encapsulation), class nên lưu trữ private MutableList
- *   nhưng chỉ để lộ ra ngoài dạng public Read-only List.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Dữ liệu bị thay đổi tùy tiện (Mutable State) là thủ phạm hàng đầu gây ra lỗi tương tranh (Race Conditions)
+ *   trong môi trường đa luồng (Multi-threading) và tác dụng phụ (Side-effects) khó kiểm soát trong ứng dụng.
+ * - Ưu tiên tính bất biến (Immutability by default) giúp code dễ dự đoán (Predictable),
+ *   dễ viết Unit Test và an toàn khi chia sẻ giữa các luồng.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - `val` vs `var`:
+ *   + *`val`*: Tối ưu và là lựa chọn mặc định cho 95% trường hợp khai báo biến.
+ *   + *`var`*: Chỉ dùng khi thực sự cần cập nhật giá trị (biến tích lũy trong vòng lặp, trạng thái thay đổi theo thời gian).
+ * - `List` vs `MutableList`:
+ *   + *Kém tối ưu*: Expose trực tiếp `MutableList` ra public. Bất kỳ thành phần nào bên ngoài cũng có thể gọi
+ *     `.clear()` hoặc `.add()` làm hỏng toàn vẹn dữ liệu của đối tượng.
+ *   + *Tối ưu nhất (Backing Property Pattern)*: Lưu trữ bên trong là `private val _list = mutableListOf<T>()`
+ *     nhưng để lộ ra ngoài là `val list: List<T> get() = _list`. Bảo vệ toàn diện tính bao đóng (Encapsulation).
  */
 
 // ==========================================
@@ -25,7 +33,6 @@ fun exampleMutableVsImmutable() {
     println("--- 5.1 val vs var ---")
     val immutableValue = 100
     // immutableValue = 200 // Lỗi biên dịch: Val cannot be reassigned
-
     var mutableValue = 100
     mutableValue = 200 // Hợp lệ
     println("mutableValue sau khi gán lại: $mutableValue")
@@ -37,6 +44,23 @@ fun exampleMutableVsImmutable() {
     val mutableList: MutableList<String> = mutableListOf("Kotlin", "Java")
     mutableList.add("Python") // Hợp lệ
     println("mutableList sau khi thêm: $mutableList")
+}
+
+fun exampleBackingPropertyPattern() {
+    println("\n--- 5.3 So sánh tối ưu: Mô hình Backing Property (Encapsulation) ---")
+    class DataRepository {
+        // Nội bộ thay đổi được
+        private val _users = mutableListOf("Admin", "Moderator")
+        // Bên ngoài chỉ đọc được
+        val users: List<String> get() = _users
+
+        fun addUser(name: String) { _users.add(name) }
+    }
+
+    val repo = DataRepository()
+    repo.addUser("Member")
+    println("Danh sách an toàn (chỉ đọc): ${repo.users}")
+    // repo.users.add(...) // Lỗi biên dịch! Không thể can thiệp phá hỏng state
 }
 
 // ==========================================
@@ -95,6 +119,7 @@ fun runPart05() {
     println("   CHẠY THỰC HÀNH PHẦN 5: MUTABLE VS IMMUTABLE")
     println("==================================================")
     exampleMutableVsImmutable()
+    exampleBackingPropertyPattern()
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
     // Test Bài tập 5.1

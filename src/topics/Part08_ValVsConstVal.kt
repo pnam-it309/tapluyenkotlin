@@ -1,25 +1,29 @@
 package topics
 
+import java.io.File
+import java.lang.annotation.RetentionPolicy
+
 /**
  * PHẦN 8: SO SÁNH VAL VÀ CONST VAL TRONG KOTLIN
  *
- * Lý thuyết:
- * 1. val (Read-only):
- *    - Giá trị được xác định ở RUNTIME (khi chương trình đang chạy).
- *    - Có thể gán thông qua kết quả của một hàm hoặc biểu thức tính toán phức tạp:
- *      val currentTime = System.currentTimeMillis()
- *    - Có thể khai báo ở bất kỳ đâu (local trong hàm, thuộc tính của class, top-level).
- *    - Có thể có custom getter.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Phân định rõ ràng giữa hai cấp độ hằng số:
+ *   1. `val` (Runtime Constant): Biến chỉ đọc, giá trị được gán khi chương trình thực thi (Runtime).
+ *   2. `const val` (Compile-time Constant): Hằng số thực sự, giá trị được xác định ngay khi biên dịch (Compile-time)
+ *      và được Compiler chèn thẳng giá trị thô (Inlined) vào nơi sử dụng trong Bytecode.
  *
- * 2. const val (Compile-time Constant):
- *    - Giá trị được xác định ở COMPILE-TIME (ngay khi trình biên dịch build mã nguồn).
- *    - Bắt buộc phải thỏa mãn 3 điều kiện ngặt nghèo:
- *      + Phải nằm ở Top-level hoặc bên trong một 'object' / 'companion object'.
- *      + Chỉ đi kèm kiểu dữ liệu nguyên thủy (Int, Double, Boolean...) hoặc 'String'.
- *      + Không được gán thông qua hàm runtime (ví dụ không thể gọi hàm lấy thời gian).
- *      + Không được có custom getter.
- *    - Tác dụng: Compiler sẽ inlined trực tiếp giá trị vào nơi sử dụng trong Bytecode,
- *      giúp tăng tốc độ xử lý tối đa (không cần overhead gọi hàm get).
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Tối ưu hóa hiệu năng: `const val` loại bỏ chi phí gọi hàm getter và chi phí cấp phát vùng nhớ.
+ * - Yêu cầu bắt buộc của Annotation: Các tham số truyền vào Annotation (ví dụ `@Retention`, `@Target`, `@Named`)
+ *   bắt buộc phải là `const val` vì Annotation processor cần biết giá trị trước khi build.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - `const val`:
+ *   + *Điều kiện*: Phải ở Top-level hoặc trong `object`/`companion object`; chỉ áp dụng cho kiểu nguyên thủy (`Int`, `Double`...) hoặc `String`.
+ *   + *Tối ưu nhất cho*: Cấu hình hệ thống cố định (Base URL, Timeout, Database Version, Action Keys, Annotations).
+ * - `val`:
+ *   + *Linh hoạt*: Khai báo được ở mọi nơi, áp dụng cho mọi kiểu đối tượng phức tạp, có thể gán từ kết quả hàm (`val now = System.currentTimeMillis()`).
+ *   + *Tối ưu cho*: Các đối tượng chỉ đọc nhưng dữ liệu phụ thuộc vào trạng thái lúc ứng dụng đang chạy.
  */
 
 // ==========================================
@@ -39,7 +43,6 @@ class ServerConfig {
     companion object {
         const val PORT = 8080
     }
-
     // val runtime: Được xác định khi tạo instance của ServerConfig
     val startedAt: Long = System.currentTimeMillis()
 }
@@ -52,6 +55,14 @@ fun exampleValVsConstVal() {
 
     val server = ServerConfig()
     println("Server started at: ${server.startedAt} (Runtime val)")
+}
+
+fun exampleConstValInliningComparison() {
+    println("--- 8.2 So sánh cơ chế Inlining của const val ---")
+    // Ở cấp độ bytecode:
+    // val count = MAX_RETRY_COUNT -> Biên dịch thành: bipush 3 (không hề gọi getter hay load biến tĩnh)
+    val retries = MAX_RETRY_COUNT
+    println("Số lần thử lại tối đa (Inlined constant): $retries")
 }
 
 // ==========================================
@@ -93,6 +104,7 @@ fun runPart08() {
     println("   CHẠY THỰC HÀNH PHẦN 8: VAL VS CONST VAL")
     println("==================================================")
     exampleValVsConstVal()
+    exampleConstValInliningComparison()
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
     val p1 = DiscountPolicy.calculateFinalPrice(isVip = true, rawAmount = 2000.0)

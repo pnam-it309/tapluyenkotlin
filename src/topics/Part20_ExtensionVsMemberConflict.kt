@@ -3,19 +3,22 @@ package topics
 /**
  * PHẦN 20: XUNG ĐỘT GIỮA EXTENSION FUNCTION VÀ MEMBER FUNCTION
  *
- * Lý thuyết:
- * 1. Câu hỏi kinh điển:
- *    - Nếu một Extension Function giống hệt một Member Function về TÊN, DANH SÁCH THAM SỐ
- *      và KIỂU TRẢ VỀ (cùng signature), thì khi gọi hàm nào sẽ chạy?
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Quy định độ ưu tiên của trình biên dịch khi có sự trùng lặp giữa Extension Function và Member Function:
+ *   **Member Function luôn luôn chiến thắng (Member Always Wins)!**
+ * - Nếu cùng Function Signature (tên hàm, số lượng và kiểu tham số), Extension Function sẽ bị che khuất (Shadowed).
  *
- * 2. Câu trả lời:
- *    - MEMBER FUNCTION LUÔN ĐƯỢC ƯU TIÊN THỰC THI (Member Always Wins)!
- *    - Trình biên dịch sẽ luôn liên kết và gọi phương thức thành viên có sẵn của Class.
- *    - Extension Function cùng signature sẽ bị "che khuất" (shadowed) hoàn toàn.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Đảm bảo tính bảo mật và toàn vẹn của Class: Ngăn chặn việc bên ngoài viết extension nhằm thay đổi ngầm,
+ *   chiếm quyền hoặc làm sai lệch hành vi vốn có của một class.
+ * - Giữ sự ổn định cho các hệ thống phần mềm lớn khi có nhiều lập trình viên cùng làm việc.
  *
- * 3. Trường hợp Overloading (Khác tham số):
- *    - Nếu Extension Function có tên giống nhưng nhận tham số KHÁC (Overloading),
- *      thì cả 2 hàm đều có thể được gọi độc lập dựa trên tham số truyền vào!
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Trùng Signature 100%: Compiler sẽ bỏ qua Extension và luôn gọi Member Function.
+ * - Khác Signature (Overloading): Nếu Extension Function nhận các tham số khác với Member Function,
+ *   cả hai đều hoạt động bình thường như các hàm nạp chồng.
+ * - Lời khuyên thiết kế tối ưu: Không bao giờ cố tình viết Extension Function trùng tên và tham số với Member Function.
+ *   Cần cẩn thận khi thư viện gốc nâng cấp phiên bản có thể bổ sung thêm method trùng tên với Extension của bạn.
  */
 
 // ==========================================

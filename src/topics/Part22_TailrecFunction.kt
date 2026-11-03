@@ -5,23 +5,26 @@ import java.math.BigInteger
 /**
  * PHẦN 22: HÀM ĐỆ QUY ĐUÔI (TAILREC) VÀ BẢN CHẤT TỐI ƯU
  *
- * Lý thuyết:
- * 1. Tác dụng của 'tailrec':
- *    - Tối ưu hóa các thuật toán đệ quy sâu, loại bỏ triệt để nguy cơ lỗi StackOverflowError.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Kích hoạt cơ chế Tối ưu hóa đệ quy đuôi (Tail Call Optimization - TCO) của trình biên dịch Kotlin.
+ * - Trình biên dịch tự động "tháo gỡ" (unroll) hàm đệ quy thành một **vòng lặp lặp lại (iterative loop)**
+ *   ở cấp độ JVM Bytecode.
  *
- * 2. Tại sao 'tailrec' có khả năng đó?
- *    - Khi một hàm được đánh dấu từ khóa 'tailrec', trình biên dịch Kotlin kiểm tra:
- *      Lệnh gọi đệ quy có phải là HÀNH ĐỘNG CUỐI CÙNG trước khi hàm return hay không?
- *    - Nếu đúng (Tail-call), Compiler sẽ tự động BIẾN ĐỔI (unroll) hàm đệ quy thành một
- *      VÒNG LẶP THƯỜNG (Loop / While) ở cấp độ JVM Bytecode!
- *    - Vì đã biến thành vòng lặp, CPU KHÔNG cấp phát thêm bất kỳ Stack Frame mới nào
- *      trên Stack bộ nhớ, do đó có thể chạy hàng triệu lần lặp mà không bao giờ bị tràn Stack.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Đệ quy truyền thống sẽ liên tục đẩy thêm Stack Frame vào Call Stack của JVM ở mỗi bước gọi.
+ *   Khi độ sâu đệ quy lớn (vài nghìn đến hàng triệu lần gọi), ứng dụng sẽ sập ngay lập tức với lỗi `StackOverflowError`.
+ * - `tailrec` giải quyết triệt để lỗi này: Độ phức tạp bộ nhớ Stack giảm từ $O(N)$ xuống $O(1)$,
+ *   cho phép chạy đệ quy sâu hàng triệu bước mà không hề tăng dung lượng Stack.
  *
- * 3. Phân biệt:
- *    - Đệ quy thường: return n * factorial(n - 1)
- *      -> Phép nhân '*' phải chờ kết quả từ factorial(n - 1) mới tính được -> KHÔNG phải tailrec!
- *    - Đệ quy đuôi: return factorialTail(n - 1, n * accumulator)
- *      -> Lệnh gọi factorialTail là hành động cuối cùng, kết quả trả về ngay -> ĐẠT CHUẨN tailrec!
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Điều kiện bắt buộc của `tailrec`:
+ *   + Lời gọi đệ quy phải là **hành động cuối cùng** (Tail-position) trước khi return.
+ *   + Không được chứa phép tính kèm sau lời gọi (ví dụ: `return n * fact(n - 1)` là SAI vì phải chờ nhân `n`).
+ *   + Phải chuyển đổi sang kỹ thuật dùng biến tích lũy (Accumulator): `return fact(n - 1, acc * n)`.
+ * - So với vòng lặp `while/for`:
+ *   + Bytecode sinh ra tương đương về tốc độ và bộ nhớ.
+ *   + `tailrec` tối ưu hơn về mặt tư duy biểu diễn thuật toán (phong cách hàm thuần túy, bất biến, dễ chứng minh tính đúng đắn).
+ * - Giới hạn: Không áp dụng được cho đệ quy phân nhánh (Duyệt cây nhị phân, đồ thị DFS).
  */
 
 // ==========================================

@@ -3,19 +3,26 @@ package topics
 /**
  * PHẦN 7: ACCESS MODIFIERS (TỪ KHÓA PHẠM VI TRUY CẬP) TRONG KOTLIN
  *
- * Lý thuyết:
- * 1. public (Mặc định trong Kotlin, khác với package-private mặc định của Java):
- *    - Có thể truy cập từ bất kỳ đâu trong toàn bộ project.
- * 2. private:
- *    - Cấp độ Class: Chỉ có thể truy cập bên trong thân của chính Class đó.
- *    - Cấp độ Top-level (ngoài class): Chỉ có thể truy cập bên trong cùng File .kt đó.
- * 3. protected:
- *    - Giống 'private', nhưng cho phép các Class con kế thừa (subclasses) truy cập được.
- *    - Lưu ý: Không thể đặt 'protected' ở cấp độ Top-level (vì file không có tính kế thừa).
- * 4. internal:
- *    - Khái niệm riêng của Kotlin: Chỉ có thể truy cập bên trong CÙNG MỘT MODULE biên dịch
- *      (ví dụ: cùng một module Gradle, Maven, hoặc IntelliJ Module).
- *    - Rất hữu dụng khi làm thư viện: Giấu implementation details không để bên ngoài module gọi.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Kiểm soát phạm vi nhìn thấy (Visibility) của class, object, constructor, hàm và thuộc tính:
+ *   1. `public` (Mặc định trong Kotlin): Truy cập từ mọi nơi.
+ *   2. `internal`: Giới hạn truy cập trong cùng một Module biên dịch (Gradle/Maven module).
+ *   3. `protected`: Chỉ class hiện tại và các class con kế thừa được phép truy cập.
+ *   4. `private`: Chỉ class hiện tại (nếu trong class) hoặc chỉ file hiện tại (nếu ở top-level) được truy cập.
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Bảo vệ tính toàn vẹn và tính bao đóng (Encapsulation) của phần mềm.
+ * - Khắc phục điểm yếu *package-private* của Java (dễ bị class cùng package bên ngoài chọc vào).
+ * - `internal` giải quyết hoàn hảo bài toán giấu implementation details trong kiến trúc đa module (Multi-module Architecture)
+ *   hoặc khi đóng gói SDK/Thư viện chia sẻ cho người khác.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - `internal` vs `public`:
+ *   + *Tối ưu nhất*: Luôn đặt `internal` cho các helper classes, database entities, network adapters bên trong module.
+ *     Chỉ mở `public` cho các Interfaces, Domain Models và Entry-points mà tầng bên ngoài thực sự cần dùng.
+ * - `private set`:
+ *   + *Tối ưu tuyệt đối*: Khi cần cho bên ngoài đọc thuộc tính nhưng cấm bên ngoài ghi giá trị (`var counter: Int = 0; private set`).
+ *     Tránh phải viết getter/setter thủ công như Java.
  */
 
 // ==========================================
@@ -42,19 +49,23 @@ class Car : BaseVehicle() {
         // println(assemblyKey) // LỖI BIÊN DỊCH: assemblyKey là private ở BaseVehicle
     }
 }
-interface gioitinh{
-    fun them()
-    fun sua()
-}
-class nam : gioitinh{
-    override fun them() {
-        val name : String? = null
-        val age : Int? = null
 
+fun exampleOptimalPrivateSet() {
+    println("--- 7.1 So sánh tối ưu: private set trong State Management ---")
+    class CounterViewModel {
+        // Cho phép đọc tự do từ bên ngoài, nhưng chỉ nội bộ ViewModel mới được tăng/giảm
+        var count: Int = 0
+            private set
 
+        fun increment() { count++ }
     }
-    override fun sua() {}
+
+    val vm = CounterViewModel()
+    vm.increment()
+    println("Giá trị đọc công khai: ${vm.count}")
+    // vm.count = 10 // LỖI BIÊN DỊCH: Cannot assign to 'count': the setter is private in 'CounterViewModel'
 }
+
 // ==========================================
 // 2. BÀI TẬP THỰC HÀNH (EXERCISES)
 // ==========================================
@@ -102,6 +113,7 @@ fun runPart07() {
     val car = Car()
     car.showDetails()
     println("Đọc FILE_SECRET bên trong file: $FILE_SECRET")
+    exampleOptimalPrivateSet()
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
     val admin = AdminAccount("admin_root", "pass123456")
@@ -112,9 +124,6 @@ fun runPart07() {
 
     println("✅ Bài tập 7.1 (EmployeeAccount vs AdminAccount Modifiers): Đạt chuẩn!")
     println("🎉 Hoàn thành xuất sắc Phần 7!\n")
-}
-class mua(secretVin: Any) : car {
-    val a = secretVin
 }
 fun main() {
     runPart07()

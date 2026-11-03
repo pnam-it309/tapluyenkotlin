@@ -3,17 +3,29 @@ package topics
 /**
  * PHẦN 14: SO SÁNH NESTED CLASS VÀ INNER CLASS TRONG KOTLIN
  *
- * Lý thuyết:
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Định nghĩa một class nằm bên trong thân của một class khác để gom nhóm logic có tính kết dính cao.
+ * - Mặc định là Nested Class (tương đương `static class` của Java).
+ * - Sử dụng từ khóa `inner` để tạo Inner Class (non-static inner class, gắn với 1 instance của outer).
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Giải quyết vấn đề rò rỉ bộ nhớ (Memory Leak) kinh điển của Java:
+ *   Trong Java, inner class mặc định luôn giữ tham chiếu ẩn đến outer class. Nếu đối tượng con sống lâu hơn
+ *   (ví dụ tác vụ ngầm, Listener, Thread), GC không thể thu hồi class cha (gây leak toàn bộ Activity/Context).
+ * - Kotlin đảo ngược triết lý: Mặc định là Nested Class (Static ngầm, KHÔNG giữ tham chiếu cha).
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
  * ┌─────────────────────────────┬─────────────────────────────────┬─────────────────────────────────┐
  * │ Tiêu chí                    │ Nested Class (Mặc định)         │ Inner Class (Có từ khóa 'inner')│
  * ├─────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
  * │ Bản chất trong Java         │ static nested class             │ non-static inner class          │
  * │ Giữ tham chiếu Outer Class  │ KHÔNG giữ tham chiếu đến outer  │ CÓ giữ tham chiếu đến outer     │
- * │ Nguy cơ Memory Leak         │ Rất an toàn, không gây leak     │ Có nguy cơ gây rò rỉ bộ nhớ     │
- * │ Truy cập biến Outer Class   │ KHÔNG thể truy cập biến của     │ CÓ THỂ truy cập biến của outer  │
- * │                             │ instance bên ngoài              │ thông qua 'this@Outer'          │
- * │ Cách khởi tạo               │ Outer.Nested()                  │ outerInstance.Inner()           │
+ * │ Nguy cơ Memory Leak         │ Tuyệt đối an toàn               │ Nguy cơ leak nếu con sống lâu   │
+ * │ Truy cập biến Outer Class   │ Không thể truy cập              │ CÓ THỂ qua 'this@Outer'         │
+ * │ Cách khởi tạo               │ Outer.Nested() (không cần cha)  │ outerInstance.Inner() (cần cha) │
  * └─────────────────────────────┴─────────────────────────────────┴─────────────────────────────────┘
+ * - Nested Class tối ưu nhất cho: Adapter ViewHolder, DTO con, Builders, Helper logic độc lập.
+ * - Inner Class tối ưu khi: Class con gắn bó mật thiết với trạng thái của một instance cha cụ thể.
  */
 
 // ==========================================
@@ -83,7 +95,7 @@ fun runPart14() {
     println("==================================================")
     println("   CHẠY THỰC HÀNH PHẦN 14: NESTED VS INNER CLASS")
     println("==================================================")
-    exampleNestedVsInner()
+//    exampleNestedVsInner()
 
     println("\n--- KIỂM TRA BÀI TẬP ---")
     // Khởi tạo Nested Policy mà không cần instance Department

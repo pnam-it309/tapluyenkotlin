@@ -3,18 +3,27 @@ package topics
 /**
  * PHẦN 16: HÀM COPY() VÀ QUAN HỆ BÌNH ĐẲNG (== VS ===)
  *
- * Lý thuyết:
- * 1. Hàm copy() trong Data Class tạo ra một BẢN SAO NÔNG (Shallow Copy):
- *    - Nó cấp phát một đối tượng mới trên Heap với các giá trị thuộc tính sao chép từ bản gốc.
- * 2. So sánh Structural Equality (Toán tử '=='):
- *    - Gọi phương thức equals() bên dưới.
- *    - Trả về TRUE (nếu giữ nguyên các thuộc tính) vì dữ liệu bên trong giống hệt nhau.
- * 3. So sánh Referential Equality (Toán tử '==='):
- *    - So sánh địa chỉ vùng nhớ RAM trên Heap.
- *    - Trả về FALSE vì bản sao copy() nằm ở một ô nhớ hoàn toàn mới so với bản gốc.
- * 4. Cảnh báo Shallow Copy:
- *    - Nếu thuộc tính bên trong là một tham chiếu đối tượng (ví dụ MutableList),
- *      thì cả bản gốc và bản copy đều trỏ chung vào cùng một danh sách đó!
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Hàm `copy()` cho phép tạo bản sao mới của một Data Class với khả năng tùy biến các trường mong muốn.
+ * - Phân định rõ ràng giữa hai toán tử so sánh:
+ *   1. `==` (Structural Equality): So sánh cấu trúc nội dung, tương đương gọi `equals()`.
+ *   2. `===` (Referential Equality): So sánh tham chiếu địa chỉ ô nhớ RAM trên Heap.
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Đóng vai trò hạt nhân trong kiến trúc hướng Unidirectional Data Flow (MVI, Redux, Jetpack Compose):
+ *   Thay vì thay đổi trực tiếp (mutate) state cũ, ta tạo ra một object state mới thông qua `copy()`
+ *   để hệ sinh thái nhận biết và trigger render lại UI mà không có race-condition.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Bản chất Shallow Copy của `copy()`:
+ *   + `copy()` chỉ sao chép nông các giá trị nguyên thủy. Với các tham chiếu lồng nhau (như `MutableList`, object con),
+ *     bản mới và bản cũ vẫn trỏ chung vào cùng một đối tượng trong bộ nhớ!
+ *   + *Tối ưu*: Luôn dùng các thuộc tính Immutable (`List` thay vì `MutableList`) bên trong Data Class
+ *     để tránh bị đột biến dữ liệu ngoài ý muốn khi dùng `copy()`.
+ * - `==` vs `===`:
+ *   + *`==`*: Tối ưu và chuẩn mực cho so sánh logic nghiệp vụ dữ liệu.
+ *   + *`===`*: Tối ưu cho kiểm tra hiệu năng (Fast-path optimization) trong UI Diffing: Nếu 2 con trỏ bằng nhau (`===`),
+ *     bỏ qua hoàn toàn việc duyệt so sánh các trường con.
  */
 
 // ==========================================

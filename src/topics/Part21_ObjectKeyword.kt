@@ -3,22 +3,26 @@ package topics
 /**
  * PHẦN 21: TÁC DỤNG CỦA TỪ KHÓA 'OBJECT' TRONG KOTLIN
  *
- * Lý thuyết:
- * Từ khóa 'object' trong Kotlin giải quyết 3 bài toán lớn:
- * 1. Singleton Object (object Declaration):
- *    - Tạo ra MỘT VÀ CHỈ MỘT instance duy nhất trong toàn bộ vòng đời ứng dụng.
- *    - Được khởi tạo Thread-safe ngay lần đầu truy cập nhờ cơ chế ClassLoader của JVM.
- *    - Ví dụ: object AppDatabase { ... }
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Từ khóa đa năng `object` trong Kotlin cung cấp 3 giải pháp kiến trúc cốt lõi:
+ *   1. Singleton Object (`object Name`): Khởi tạo một đối tượng duy nhất trên toàn ứng dụng.
+ *   2. Companion Object (`companion object`): Thành viên gắn liền với Class (thay thế `static` của Java).
+ *   3. Anonymous Object Expression (`object : Interface`): Tạo đối tượng ẩn danh sử dụng tức thời tại chỗ.
  *
- * 2. Companion Object:
- *    - Nằm bên trong một Class thông thường, tạo các phương thức/thuộc tính ở cấp độ Class
- *      (thay thế từ khóa 'static' của Java).
- *    - Rất phổ biến khi làm Factory Method (ví dụ: User.createGuest()).
- *    - Có thể kế thừa class khác hoặc implement Interface.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Trong Java, việc cài đặt một Singleton an toàn đa luồng đòi hỏi viết nhiều code phức tạp
+ *   (Double-Checked Locking, biến `volatile`, private constructor...). Kotlin giải quyết việc này với duy nhất 1 từ khóa `object`.
+ * - Kotlin loại bỏ từ khóa `static`, thay vào đó `companion object` là một đối tượng thực sự có thể kế thừa và implement Interface.
  *
- * 3. Anonymous Object Expression (object : Interface/Class):
- *    - Tạo đối tượng ẩn danh tại chỗ (thay thế Anonymous Inner Class của Java).
- *    - Thường dùng làm Listener, Callback hoặc Event Handler.
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Singleton Object:
+ *   + Tối ưu cho: Dịch vụ chia sẻ toàn cục, quản lý cấu hình (Configuration), bộ nhớ đệm (Cache), Converter utils.
+ *   + Cơ chế: Được JVM khởi tạo Lazy tự động khi được truy cập lần đầu và đảm bảo an toàn Thread-safe tuyệt đối.
+ * - Companion Object:
+ *   + Tối ưu nhất cho: **Factory Method Pattern** (`User.createDefault()`), nơi khai báo hằng số `const val` gắn với Class.
+ * - Anonymous Object Expression:
+ *   + Tối ưu cho: UI ClickListener, Network Callback. Vượt trội hơn Java vì có thể implement cùng lúc nhiều interface
+ *     và truy cập trực tiếp các biến bên ngoài mà không cần biến đó phải là `final`.
  */
 
 // ==========================================

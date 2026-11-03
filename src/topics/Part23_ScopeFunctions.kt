@@ -3,15 +3,26 @@ package topics
 /**
  * PHẦN 23: PHÂN BIỆT 5 SCOPE FUNCTIONS (LET, RUN, WITH, APPLY, ALSO)
  *
- * Lý thuyết tổng hợp:
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Cung cấp một ngữ cảnh tạm thời để thực thi một khối mã trên một đối tượng.
+ * - Được phân định dựa trên 2 tiêu chí cốt lõi:
+ *   1. Biến ngữ cảnh bên trong lambda: `this` (Receiver) vs `it` (Argument).
+ *   2. Giá trị trả về: Trả về chính đối tượng đó (Context Object) vs Trả về kết quả của khối Lambda (Lambda Result).
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Loại bỏ việc phải lặp lại tên một biến quá nhiều lần khi thiết lập thuộc tính hoặc gọi hàm liên tiếp.
+ * - Tạo chuỗi xử lý (Method Chaining / Pipeline) thanh lịch, gọn gàng.
+ * - Xử lý kiểm tra Null an toàn kết hợp biến đổi dữ liệu (`?.let`).
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
  * ┌──────────┬─────────────────┬──────────────────┬────────────────────────────────────────────────────────┐
- * │ Function │ Context Object  │ Return Value     │ Trường hợp sử dụng tiêu biểu                           │
+ * │ Function │ Context Object  │ Return Value     │ Trường hợp sử dụng tối ưu nhất                         │
  * ├──────────┼─────────────────┼──────────────────┼────────────────────────────────────────────────────────┤
+ * │ apply    │ this (receiver) │ Chính Context Obj│ Cấu hình thuộc tính cho đối tượng (Builder pattern)   │
+ * │ also     │ it (tham số)    │ Chính Context Obj│ Tác vụ phụ trợ không đổi chuỗi gọi hàm (Log, Debug)    │
  * │ let      │ it (tham số)    │ Kết quả Lambda   │ Kiểm tra Null (obj?.let) và biến đổi (transform) kiểu  │
  * │ run      │ this (receiver) │ Kết quả Lambda   │ Cấu hình đối tượng và tính toán trả về kết quả         │
  * │ with     │ this (receiver) │ Kết quả Lambda   │ Gọi nhiều hàm trên đối tượng non-null không lặp tên    │
- * │ apply    │ this (receiver) │ Chính Context Obj│ Cấu hình thuộc tính cho đối tượng (Builder pattern)   │
- * │ also     │ it (tham số)    │ Chính Context Obj│ Tác vụ phụ trợ không đổi chuỗi gọi hàm (Log, Validate)│
  * └──────────┴─────────────────┴──────────────────┴────────────────────────────────────────────────────────┘
  */
 

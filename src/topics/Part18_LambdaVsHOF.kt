@@ -3,23 +3,24 @@ package topics
 /**
  * PHẦN 18: LAMBDA LÀ GÌ, SO SÁNH HIGHER-ORDER FUNCTION VÀ LAMBDA
  *
- * Lý thuyết:
- * 1. Lambda Expression:
- *    - Là một hàm vô danh (Anonymous Function) được viết dưới dạng biểu thức ngắn gọn:
- *      { x: Int, y: Int -> x + y }
- *    - Trong Kotlin, hàm là "First-Class Citizen", tức là một biểu thức Lambda có thể:
- *      + Được gán vào một biến: val sum = { a: Int, b: Int -> a + b }
- *      + Được truyền làm đối số cho hàm khác.
- *      + Được trả về từ một hàm.
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Lambda Expression: Là một hàm vô danh (Anonymous function) được viết dưới dạng biểu thức `{ a, b -> a + b }`.
+ *   Đóng vai trò như một GIÁ TRỊ (Function Value) có thể gán vào biến hoặc truyền làm đối số.
+ * - Higher-Order Function (HOF): Là HÀM TIÊU THỤ nhận Lambda làm đối số hoặc sản xuất trả về Lambda.
  *
- * 2. So sánh Lambda và Higher-Order Function:
- *    - LAMBDA: Là "Dữ liệu/Giá trị" (Function Value/Expression).
- *    - HIGHER-ORDER FUNCTION: Là "Hàm chứa/tiêu thụ" (Consumer/Producer) nhận hoặc trả về Lambda.
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Xây dựng phong cách lập trình khai báo (Declarative): Người lập trình chỉ cần mô tả "Muốn làm gì"
+ *   thay vì "Làm từng bước lặp như thế nào".
+ * - Giảm đáng kể số dòng code, tăng tính trực quan với cú pháp Trailing Lambda và định danh ngầm định `it`.
  *
- * 3. Các cú pháp đặc sắc của Lambda trong Kotlin:
- *    - 'it': Tên ngầm định cho tham số duy nhất của lambda ({ it * 2 }).
- *    - Trailing Lambda: Nếu tham số cuối của hàm là lambda, được đưa ra ngoài ngoặc tròn 'myFunc(arg) { ... }'.
- *    - Bỏ ngoặc tròn: Nếu lambda là tham số duy nhất, bỏ luôn '()': 'list.filter { it > 0 }'.
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Trailing Lambda Syntax: Nếu tham số cuối của hàm là lambda, luôn đưa ra ngoài dấu ngoặc tròn:
+ *   `list.filter { it > 0 }` thay vì `list.filter({ it > 0 })`.
+ * - Tên ngầm định `it` vs Tên tham số tường minh:
+ *   + *Dùng `it`*: Khi lambda ngắn gọn và chỉ có 1 tham số duy nhất.
+ *   + *Khai báo tên tường minh (`{ user -> ... }`)*: Khi lambda có nhiều tham số hoặc lồng nhau phức tạp,
+ *     giúp tránh nhầm lẫn biến ngữ cảnh.
+ * - Method Reference (`::println`): Tối ưu hơn lambda `{ println(it) }` khi chỉ chuyển tiếp nguyên vẹn tham số.
  */
 
 // ==========================================

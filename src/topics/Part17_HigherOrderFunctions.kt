@@ -3,18 +3,22 @@ package topics
 /**
  * PHẦN 17: HIGHER-ORDER FUNCTION (HÀM BẬC CAO) TRONG KOTLIN
  *
- * Lý thuyết:
- * 1. Khái niệm:
- *    - Higher-Order Function (HOF) là hàm nhận một hàm khác làm THAM SỐ truyền vào,
- *      hoặc TRẢ VỀ kết quả là một hàm.
- * 2. Cú pháp kiểu dữ liệu hàm (Function Type):
- *    - (Int, Int) -> Int      : Nhận 2 số Int, trả về 1 số Int.
- *    - () -> Unit             : Không nhận tham số, không trả về giá trị.
- *    - (String) -> Boolean    : Nhận chuỗi String, trả về Boolean.
- * 3. Tác dụng chính:
- *    - Tăng tính tái sử dụng code (DRY).
- *    - Trừu tượng hóa logic dùng chung (ví dụ: đo thời gian chạy hàm, retry khi lỗi, log request).
- *    - Xây dựng các pipeline xử lý dữ liệu mạnh mẽ như filter, map, fold...
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Higher-Order Function (HOF) là hàm coi hàm khác như dữ liệu hạng nhất (First-Class Citizen):
+ *   Có thể nhận một hoặc nhiều hàm làm tham số, hoặc trả về một hàm khác.
+ * - Cú pháp Function Type: `(A, B) -> R` (nhận tham số A, B và trả về kiểu R).
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Tái sử dụng tối đa logic mẫu (Template Logic / Framework): Cho phép viết sẵn cấu trúc bao bọc
+ *   (đo thời gian thực thi, log request, xử lý transaction, retry lỗi) và chỉ cần truyền hành vi lõi vào.
+ * - Loại bỏ các Anonymous SAM Interface cồng kềnh thường thấy trong Java cổ điển.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - HOF vs Interface Callback của Java: HOF ngắn hơn, linh hoạt hơn, không cần tạo class mới.
+ * - Tối ưu hiệu năng với `inline`:
+ *   + Khi gọi HOF thông thường, JVM sẽ khởi tạo một object kiểu `FunctionN` trên Heap.
+ *   + Nếu HOF được gọi lặp đi lặp lại nhiều lần (như duyệt collection, vòng lặp), hãy thêm từ khóa `inline`:
+ *     Compiler sẽ chèn trực tiếp mã bytecode của lambda vào nơi gọi, triệt tiêu hoàn toàn chi phí cấp phát bộ nhớ.
  */
 
 // ==========================================
@@ -25,7 +29,13 @@ package topics
 fun calculate(a: Int, b: Int, operation: (Int, Int) -> Int): Int {
     return operation(a, b)
 }
-
+fun name(){
+    val a = 2
+    val b = 3
+    val c = a + b
+    println(c)
+    calculate(2,4,{ a, b -> a+b})
+}
 // Ví dụ 2: HOF bọc logic đo thời gian thực thi (Benchmarking)
 fun <T> measureExecutionTime(blockName: String, action: () -> T): T {
     val start = System.nanoTime()

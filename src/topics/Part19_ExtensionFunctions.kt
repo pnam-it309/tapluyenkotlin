@@ -3,19 +3,22 @@ package topics
 /**
  * PHẦN 19: EXTENSION FUNCTION (HÀM MỞ RỘNG) TRONG KOTLIN
  *
- * Lý thuyết:
- * 1. Khái niệm:
- *    - Extension Function cho phép thêm các phương thức mới vào một Class đã tồn tại
- *      (kể cả các lớp có sẵn trong JDK như String, Int, List...) mà KHÔNG cần phải kế thừa
- *      (inherit) hay áp dụng các Design Pattern bọc phức tạp (như Decorator/Wrapper).
- * 2. Cú pháp:
- *    - fun ReceiverType.functionName(params): ReturnType { ... }
- *    - Bên trong thân hàm, từ khóa 'this' đại diện cho đối tượng đang gọi hàm (Receiver Object).
- * 3. Bản chất dưới Bytecode (JVM):
- *    - Trình biên dịch sinh ra một static method thông thường trong Java:
- *      public static boolean isEven(int $this$isEven) { ... }
- *    - Do đó, Extension Function HOÀN TOÀN KHÔNG thực sự sửa đổi Class gốc.
- *    - Nó KHÔNG THỂ truy cập các thành viên private hay protected của Class gốc!
+ * 🎯 1. TÁC DỤNG (BẢN CHẤT & MỤC ĐÍCH):
+ * - Cho phép thêm các phương thức/thuộc tính mới vào một Class đã tồn tại (kể cả class từ JDK, Android SDK
+ *   hoặc thư viện bên thứ ba đã đóng gói jar) mà không cần kế thừa (Inheritance) hay sửa đổi mã nguồn gốc.
+ * - Cú pháp: `fun ReceiverType.functionName(params): ReturnType` (từ khóa `this` trỏ tới đối tượng gọi hàm).
+ *
+ * 💡 2. VÌ SAO LẠI DÙNG ĐẾN NÓ (GIẢI QUYẾT VẤN ĐỀ GÌ):
+ * - Thay thế các lớp tiện ích "xấu xí" trong Java như `StringUtils.capitalize(str)` hay `DateUtils.format(date)`.
+ * - Đem lại cú pháp gọi hàm tự nhiên như method thành viên: `str.capitalize()`, `date.format()`,
+ *   kết hợp mượt mà với gợi ý code (IntelliSense/AutoComplete) của IDE.
+ *
+ * ⚖️ 3. SO SÁNH & TRƯỜNG HỢP SỬ DỤNG TỐI ƯU HƠN:
+ * - Bản chất Bytecode: Extension function chỉ là một Java **Static Method** nhận đối tượng gọi làm tham số đầu tiên
+ *   (`public static void myFunc(Receiver $this)`).
+ * - Phân giải tĩnh (Static Dispatch): Được phân giải dựa trên kiểu khai báo tại Compile-time, KHÔNG hỗ trợ Đa hình (Polymorphism).
+ * - Không phá vỡ tính bao đóng: Extension function KHÔNG THỂ truy cập các thành viên `private` hay `protected` của Class gốc.
+ * - Trường hợp tối ưu nhất: Viết tiện ích cho View/UI Android, format chuỗi, bóc tách Collections, chuyển đổi kiểu dữ liệu.
  */
 
 // ==========================================
